@@ -19,3 +19,4 @@
 - - add *modalInstance* to `leagues.controller` as deleteItem function
 - - encapsulate $modalInstance into a service = *dialogsService*
 - - leauges.controller uses dialogs.service & displays message using confirm-modal.html
+- - use *typeahead* for creating auto-complete suggestions in forms  (edit-teams.html)
