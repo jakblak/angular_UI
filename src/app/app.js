@@ -31,8 +31,8 @@
         controller: 'TeamsCtrl',
         controllerAs: 'vm',
         resolve: {
-          initialData: ['$route', 'eliteApi', function($route, eliteApi) {
-            return eliteApi.getTeams($route.current.params.id);
+          initialData: ['$route', 'gamesInitialDataService', function($route, eliteApi) {
+            return gamesInitialDataService.getData($route.current.params.id);
           }]
         }
       })
