@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    angular.module('eliteAdmin').controller('ShellCtrl', ShellCtrl);
+    angular.module('eliteAdmin')
+    .controller('ShellCtrl', ShellCtrl);
 
     ShellCtrl.$inject = ['$rootScope'];
 

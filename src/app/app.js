@@ -2,66 +2,97 @@
   'use strict';
   var app = angular.module('eliteAdmin', [
     // Angular modules
-    'ngRoute',
-    'ui.bootstrap'
+    // 'ngRoute',
+    'ui.bootstrap',
+    'ui.router'
   ]);
 
-  app.config(['$routeProvider', configRoutes]);
+  // app.config(['$stateParamsProvider', configRoutes]);
+  app.config(['$stateProvider', '$urlRouterProvider', configRoutes]);
 
-  function configRoutes($routeProvider) {
-    $routeProvider
-      .when('/', {
+  function configRoutes($stateProvider, $urlRouterProvider) {
+    $stateProvider
+      .state('home', {
+        url: '/',
         templateUrl: 'app/home/home.html',
         controller: 'HomeCtrl',
         controllerAs: 'vm'
       })
-      .when('/leagues', {
+      .state('leagues', {
+        url: '/leagues',
         templateUrl: 'app/leagues/leagues.html',
         controller: 'LeaguesCtrl',
         controllerAs: 'vm',
         resolve: {
           // prepopulate data with the leagues
-          initialData: ['eliteApi', function(eliteApi) {
-            return eliteApi.getLeagues();
-          }]
-        }
-      })
-      .when('/leagues/:id/teams', {
-        templateUrl: 'app/teams/teams.html',
-        controller: 'TeamsCtrl',
-        controllerAs: 'vm',
-        resolve: {
-          initialData: ['$route', 'gamesInitialDataService', function($route, eliteApi) {
-            return gamesInitialDataService.getData($route.current.params.id);
-          }]
-        }
-      })
-      .when('/leagues/:id/games', {
-        templateUrl: 'app/games/games.html',
-        controller: 'GamesCtrl',
-        controllerAs: 'vm',
-        resolve: {
-          initialData: ['$route', 'eliteApi', function($route, eliteApi) {
-            return eliteApi.getGames($route.current.params.id);
+          initialData: ['eliteApi',
+            function(eliteApi) {
+              return eliteApi.getLeagues();
             }]
         }
       })
-      .when('/leagues/:id/league-home', {
-        templateUrl: 'app/league-home/league-home.html',
-        controller: 'LeagueHomeCtrl',
+      .state('league', {
+        url: '/leagues/:leagueId',
+        abstract: true,              //must add ui-view to .html
+        controller: 'LeagueShellCtrl',
         controllerAs: 'vm',
-        resolve: {
-          initialData: ['$route', 'eliteApi', function($route, eliteApi) {
-            return eliteApi.getLeague($route.current.params.id);
-            }]
+        templateUrl: 'app/layout/league-shell.html'
+      })
+      .state('league.teams', {
+        url: '/teams',
+        views: {
+          'tabContent': {
+            templateUrl: 'app/teams/teams.html',
+            controller: 'TeamsCtrl',
+            controllerAs: 'vm',
+            resolve: {
+              initialData: ['$stateParams', 'eliteApi',
+                function($stateParams, eliteApi) {
+                  return eliteApi.getTeams($stateParams.leagueId);
+                }]
+            }
+          }
+        }
+
+      })
+      .state('league.games', {
+        url: '/games',
+        views: {
+          'tabContent': {
+            templateUrl: 'app/games/games.html',
+            controller: 'GamesCtrl',
+            controllerAs: 'vm',
+            resolve: {
+              initialData: ['$stateParams', 'gamesInitialDataService',
+                function($stateParams, gamesInitialDataService) {
+                  return gamesInitialDataService.getData($stateParams.leagueId);
+                }]
+            }
+          }
+        }
+      })
+      .state('league.home', {
+        url: '/league-home',
+        views: {
+          'tabContent': {
+            templateUrl: 'app/league-home/league-home.html',
+            controller: 'LeagueHomeCtrl',
+            controllerAs: 'vm',
+            resolve: {
+              initialData: ['$stateParams', 'eliteApi',
+                function($stateParams, eliteApi) {
+                  return eliteApi.getLeague($stateParams.id);
+                }]
+            }
+          }
         }
       });
-    $routeProvider.otherwise('/');
+    $urlRouterProvider.otherwise('/');
   }
 
-  app.run(['$route',
-    function($route) {
-      // Include $route to kick start the router.
+  app.run(['$state', 'stateWatcherService',
+    function($state, stateWatcherService) {
+      // Include $stateParams to kick start the router.
     }
   ]);
 })();

@@ -113,7 +113,7 @@
       });
 
       modalInstance.result.then(function(result) {
-        result.leagueId = $stateParams.leagueId;
+        result.leagueId = $stateParams.id;
         eliteApi.saveGame(result).then(function(data) {
           if (game) {
             _.assign(game, data);
@@ -138,6 +138,10 @@
         return true;
       }
     }
+
+    // function go(path) {
+    //   $location.path('leagues/' + $routeParams.id + '/' + path);
+    // }
 
   }
 })();
